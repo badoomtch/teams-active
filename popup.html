@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    :root {
+      --bg-page:       #1F1F1F;
+      --bg-surface:    #292929;
+      --bg-surface2:   #333333;
+      --fg-primary:    #FFFFFF;
+      --fg-secondary:  #D6D6D6;
+      --fg-tertiary:   #ADADAD;
+      --fg-disabled:   #5C5C5C;
+      --stroke-1:      #525252;
+      --stroke-2:      #404040;
+      --brand:         #479EF5;
+      --brand-hover:   #62ABF5;
+      --success:       #6CCB5F;
+      --warning:       #FCE100;
+      --radius-md:     4px;
+      --radius-lg:     8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 340px;
+      font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 20px;
+      background: var(--bg-page);
+      color: var(--fg-primary);
+      padding: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--stroke-2);
+    }
+    .header-icon {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-md);
+      background: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .header-icon svg { width: 18px; height: 18px; fill: #fff; }
+    .header-text { flex: 1; }
+    .header-text h1 { font-size: 15px; font-weight: 600; line-height: 20px; }
+    .header-text .subtitle { font-size: 12px; line-height: 16px; color: var(--fg-tertiary); }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 10000px;
+      background: var(--stroke-2);
+      color: var(--fg-tertiary);
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .status-badge.active { background: rgba(108, 203, 95, 0.15); color: var(--success); }
+    .status-badge.paused { background: rgba(252, 225, 0, 0.12); color: var(--warning); }
+
+    /* ── Tab counter strip ───────────────────── */
+    .tab-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--fg-tertiary);
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--stroke-2);
+      border-radius: var(--radius-md);
+    }
+    .tab-strip svg { width: 13px; height: 13px; fill: var(--fg-tertiary); flex-shrink: 0; }
+    .tab-strip .tab-count { font-weight: 600; color: var(--fg-secondary); }
+    .tab-strip .tab-count.none { color: var(--fg-disabled); }
+
+    /* ── Cards ───────────────────────────────── */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--stroke-2);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--fg-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .divider {
+      height: 1px;
+      background: var(--stroke-2);
+      margin: 10px 0;
+    }
+
+    /* ── Toggle row ──────────────────────────── */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 32px;
+    }
+    .toggle-row + .toggle-row { margin-top: 6px; }
+    .toggle-label { flex: 1; }
+    .toggle-label .label { font-size: 13px; color: var(--fg-primary); }
+    .toggle-label .sublabel { font-size: 12px; color: var(--fg-tertiary); margin-top: 1px; }
+
+    /* Fluent Switch — 40×20 */
+    .fluent-switch { position: relative; width: 40px; height: 20px; flex-shrink: 0; }
+    .fluent-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .fluent-switch .track {
+      position: absolute; inset: 0;
+      border-radius: 10px;
+      border: 1px solid #888;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.1s ease, border-color 0.1s ease;
+    }
+    .fluent-switch .track::before {
+      content: "";
+      position: absolute;
+      width: 14px; height: 14px;
+      top: 2px; left: 2px;
+      border-radius: 50%;
+      background: #888;
+      transition: transform 0.1s ease, background 0.1s ease;
+    }
+    .fluent-switch input:checked + .track { background: var(--brand); border-color: var(--brand); }
+    .fluent-switch input:checked + .track::before { background: #000; transform: translateX(20px); }
+    .fluent-switch:hover .track { background: var(--bg-surface2); }
+    .fluent-switch:hover .track::before { background: #fff; }
+    .fluent-switch:hover input:checked + .track { background: var(--brand-hover); border-color: var(--brand-hover); }
+    .fluent-switch:hover input:checked + .track::before { background: #000; }
+
+    /* ── Collapsible sub-sections ────────────── */
+    .sub-section { transition: opacity 0.15s ease; }
+    .sub-section.disabled { opacity: 0.35; pointer-events: none; }
+
+    /* ── Time pair ───────────────────────────── */
+    .time-pair {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .time-pair label { font-size: 12px; color: var(--fg-tertiary); white-space: nowrap; }
+    .time-pair input[type="time"] {
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--fg-primary);
+      background: var(--bg-page);
+      border: 1px solid var(--stroke-1);
+      border-radius: var(--radius-md);
+      padding: 3px 6px;
+      height: 28px;
+      outline: none;
+      transition: border-color 0.1s ease;
+      flex: 1;
+    }
+    .time-pair input[type="time"]:focus { border-color: var(--brand); }
+    .time-pair input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
+
+    /* ── Days of week ────────────────────────── */
+    .days-row {
+      display: flex;
+      gap: 5px;
+      margin-top: 8px;
+    }
+    .day-btn {
+      flex: 1;
+      height: 28px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--fg-tertiary);
+      background: var(--bg-page);
+      border: 1px solid var(--stroke-1);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.1s ease;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .day-btn:hover { border-color: var(--stroke-1); background: var(--bg-surface2); color: var(--fg-secondary); }
+    .day-btn.selected { background: rgba(71, 158, 245, 0.15); border-color: var(--brand); color: var(--brand); }
+
+    /* ── Slider ──────────────────────────────── */
+    .slider-block { margin-top: 2px; }
+    .slider-block + .slider-block { margin-top: 0; }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+    .slider-header .label { font-size: 13px; color: var(--fg-secondary); }
+    .slider-header .value { font-size: 13px; font-weight: 600; color: var(--brand); min-width: 44px; text-align: right; }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--stroke-1);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 2px solid var(--brand);
+      margin-top: -8px;
+      cursor: pointer;
+      transition: border-color 0.1s ease, background 0.1s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { border-color: var(--brand-hover); }
+    input[type="range"]::-webkit-slider-thumb:active { background: var(--brand); }
+
+    /* ── Footer ──────────────────────────────── */
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--fg-disabled);
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.5 6a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM20 7h-5a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1ZM10 5a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM14 7H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2ZM10 20H3a2 2 0 0 1-2-2v-5h2v5h7v2Z"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Teams Active</h1>
+      <div class="subtitle">Keep your status online</div>
+    </div>
+    <div class="status-badge" id="statusBadge">Off</div>
+  </div>
+
+  <!-- Tab counter -->
+  <div class="tab-strip">
+    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5Zm14-1H4a1 1 0 0 0-1 1v1h14V5a1 1 0 0 0-1-1ZM3 8v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8H3Z"/>
+    </svg>
+    <span id="tabCountText">Checking for Teams tabs…</span>
+  </div>
+
+  <!-- Master Toggle -->
+  <div class="card">
+    <div class="toggle-row">
+      <div class="toggle-label">
+        <div class="label">Keep Active</div>
+        <div class="sublabel">Prevents away status on Teams web</div>
+      </div>
+      <label class="fluent-switch">
+        <input type="checkbox" id="enableToggle">
+        <span class="track"></span>
+      </label>
+    </div>
+    <div class="divider"></div>
+    <div class="toggle-row">
+      <div class="toggle-label">
+        <div class="label">Human-like timing</div>
+        <div class="sublabel">Randomises intervals so pings look natural</div>
+      </div>
+      <label class="fluent-switch">
+        <input type="checkbox" id="humanToggle" checked>
+        <span class="track"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Timing -->
+  <div class="card">
+    <div class="card-title">Activity Interval</div>
+    <div class="slider-block">
+      <div class="slider-header">
+        <span class="label">Ping every</span>
+        <span class="value" id="intervalValue">4 min</span>
+      </div>
+      <input type="range" id="intervalSlider" min="1" max="10" step="0.5" value="4">
+    </div>
+  </div>
+
+  <!-- Schedule -->
+  <div class="card">
+    <div class="card-title">Schedule</div>
+
+    <!-- Work hours -->
+    <div class="toggle-row">
+      <div class="toggle-label">
+        <div class="label">Work hours only</div>
+      </div>
+      <label class="fluent-switch">
+        <input type="checkbox" id="scheduleToggle">
+        <span class="track"></span>
+      </label>
+    </div>
+    <div class="sub-section disabled" id="scheduleFields">
+      <div class="time-pair">
+        <label>From</label>
+        <input type="time" id="startTime" value="08:00">
+        <label>To</label>
+        <input type="time" id="endTime" value="17:00">
+      </div>
+
+      <!-- Days of week -->
+      <div class="days-row" id="daysRow">
+        <button class="day-btn selected" data-day="1">M</button>
+        <button class="day-btn selected" data-day="2">Tu</button>
+        <button class="day-btn selected" data-day="3">W</button>
+        <button class="day-btn selected" data-day="4">Th</button>
+        <button class="day-btn selected" data-day="5">F</button>
+        <button class="day-btn" data-day="6">Sa</button>
+        <button class="day-btn" data-day="0">Su</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Lunch break -->
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <div class="label">Lunch break</div>
+        </div>
+        <label class="fluent-switch">
+          <input type="checkbox" id="lunchToggle">
+          <span class="track"></span>
+        </label>
+      </div>
+      <div class="sub-section disabled" id="lunchFields">
+        <div class="time-pair">
+          <label>From</label>
+          <input type="time" id="lunchStart" value="12:00">
+          <label>To</label>
+          <input type="time" id="lunchEnd" value="13:00">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Active on Teams web tabs only</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
