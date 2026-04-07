@@ -78,15 +78,18 @@ function notifyTabs(action) {
 }
 
 function isAllowedNow(s) {
-  if (!s.scheduleEnabled) return true;
-
   const now     = new Date();
   const minutes = now.getHours() * 60 + now.getMinutes();
   const day     = now.getDay();
 
-  const allowedDays = s.activeDays || [1, 2, 3, 4, 5];
-  if (!allowedDays.includes(day)) return false;
-  if (!inRange(minutes, s.startTime, s.endTime)) return false;
+  // Work hours + days — only checked when schedule is enabled
+  if (s.scheduleEnabled) {
+    const allowedDays = s.activeDays || [1, 2, 3, 4, 5];
+    if (!allowedDays.includes(day)) return false;
+    if (!inRange(minutes, s.startTime, s.endTime)) return false;
+  }
+
+  // Lunch break is independent of the schedule toggle
   if (s.lunchEnabled && inRange(minutes, s.lunchStart, s.lunchEnd)) return false;
 
   return true;
